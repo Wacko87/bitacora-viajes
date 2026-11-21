@@ -4,6 +4,30 @@
 
 ---
 
+## 📸 Capturas de Pantalla
+
+### 🗺️ Cuaderno de Viajes & Crónica a Dos Voces
+| Cuaderno de Viajes y Presupuestos | Detalle de Expedición & Crónica Diaria |
+| :---: | :---: |
+| ![Cuaderno de Viajes](docs/screenshots/02-trips-view.png) | ![Detalle del Viaje](docs/screenshots/03-trip-detail-chronicle.png) |
+
+### 🪙 Gabinete Numismático & Series de Divisas
+| Vitrina Numismática 3D Interactiva | Series Oficiales del Cono Monetario |
+| :---: | :---: |
+| ![Gabinete Numismático](docs/screenshots/06-numismatic-cabinet.png) | ![Series Circulantes](docs/screenshots/04-numismatic-series.png) |
+
+### 📖 Libro de Viaje Editorial & Pasaporte Digital
+| Libro de Viaje Editorial (PDF / A4) | Pasaporte & Mapamundi Interactivo |
+| :---: | :---: |
+| ![Libro de Viaje](docs/screenshots/05-photobook-export.png) | ![Mapamundi y Estadísticas](docs/screenshots/07-passport-worldmap.png) |
+
+### 🔐 Acceso Seguro y Privado para la Pareja
+<p align="center">
+  <img src="docs/screenshots/01-login.png" alt="Acceso Seguro con PIN" width="600" />
+</p>
+
+---
+
 ## 🌟 Características Principales
 
 ### 1. 🪙 Gabinete Numismático (Billetes y Monedas Circulantes)
