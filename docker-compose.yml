@@ -1,0 +1,20 @@
+services:
+  bitacora-viajes:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bitacora-viajes
+    image: bitacora-viajes:latest
+    restart: unless-stopped
+    ports:
+      - "3040:3040"
+    environment:
+      - NODE_ENV=production
+      - PORT=3040
+      - HOST=0.0.0.0
+      - DATA_DIR=/data
+      - TRUST_PROXY=127.0.0.1,172.16.0.0/12,192.168.0.0/16
+      - ALLOWED_DOMAINS=localhost
+      # - SEED_DEMO=true # Descomenta para inicializar con viajes y billetes demo
+    volumes:
+      - ./data:/data
