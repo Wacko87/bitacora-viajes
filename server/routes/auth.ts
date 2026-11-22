@@ -62,11 +62,12 @@ export async function authRoutes(fastify: FastifyInstance) {
       return reply.status(400).send({ error: 'Profile y PIN son obligatorios' });
     }
 
-    // 1. Check account lockout from brute force attempts
-    const lockout = checkAccountLockout(profile_id);
+    // 1. Check account lockout from brute force attempts (asociado a la IP del cliente y perfil)
+    const clientIp = req.ip || 'unknown';
+    const lockout = checkAccountLockout(clientIp, profile_id);
     if (lockout.locked) {
       return reply.status(429).send({
-        error: `Demasiados intentos fallidos. Perfil bloqueado durante ${lockout.remainingSec} segundos.`,
+        error: `Demasiados intentos fallidos desde tu conexión. Acceso bloqueado durante ${lockout.remainingSec} segundos.`,
       });
     }
 
@@ -81,13 +82,13 @@ export async function authRoutes(fastify: FastifyInstance) {
     const isCorrect = verifyPin(pin, profile.pin_code);
 
     if (!isCorrect) {
-      const attempt = recordFailedAttempt(profile_id);
+      const attempt = recordFailedAttempt(clientIp, profile_id);
       // Artificial tarpit delay against timing and automated enumeration
       await new Promise((res) => setTimeout(res, 800));
 
       if (attempt.locked) {
         return reply.status(429).send({
-          error: `Has superado el límite de 5 intentos. Perfil bloqueado durante 5 minutos por seguridad.`,
+          error: `Has superado el límite de 5 intentos fallidos. Conexión bloqueada durante 5 minutos por seguridad.`,
         });
       }
 
@@ -97,7 +98,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
 
     // 3. Reset failed attempts counter on successful login
-    resetFailedAttempts(profile_id);
+    resetFailedAttempts(clientIp, profile_id);
 
     // 4. Auto-upgrade legacy plaintext PIN to scrypt cryptographic hash
     if (!profile.pin_code.startsWith('scrypt:')) {
@@ -105,7 +106,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       db.prepare('UPDATE profiles SET pin_code = ? WHERE id = ?').run(hashed, profile.id);
     }
 
-    // 5. Issue cryptographically signed HMAC-SHA256 session cookie
+    // 5. Issue cryptographically signed HMAC-SHA256 session cookie (90 días de vigencia)
     const isHttps = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https';
     reply.setCookie('bitacora_session', profile.id, {
       path: '/',
@@ -113,7 +114,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       secure: isHttps,
       sameSite: 'lax',
       signed: true,
-      maxAge: 365 * 24 * 60 * 60, // 1 year
+      maxAge: 90 * 24 * 60 * 60, // 90 días (rotación segura)
     });
 
     // Clear obsolete unsigned cookie if present

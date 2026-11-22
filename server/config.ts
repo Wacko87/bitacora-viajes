@@ -42,8 +42,11 @@ function getOrGenerateSessionSecret(): string {
     const generated = crypto.randomBytes(32).toString('hex');
     fs.writeFileSync(secretFile, generated, { encoding: 'utf8', mode: 0o600 });
     return generated;
-  } catch {
-    return 'bitacora-super-secret-key-32-chars-minimum!';
+  } catch (err) {
+    // Si no se puede persistir el archivo en disco, generar clave criptográfica efímera en memoria
+    // NUNCA utilizar una clave estática predecible o hardcodeada (CWE-798 / SEC-05)
+    console.warn('[Config] ADVERTENCIA: No se pudo persistir session_secret.key en disco. Generando secreto efímero en memoria:', err);
+    return crypto.randomBytes(32).toString('hex');
   }
 }
 

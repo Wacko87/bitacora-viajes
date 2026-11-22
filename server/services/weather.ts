@@ -89,14 +89,22 @@ export async function fetchTripWeather(
 ): Promise<TripWeatherResult | null> {
   if (!startDate || !endDate) return null;
 
+  // Validación estricta de formato ISO YYYY-MM-DD para prevenir inyección de parámetros HTTP (SEC-04)
+  const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+  if (!DATE_REGEX.test(startDate) || !DATE_REGEX.test(endDate)) {
+    return null;
+  }
+
   const coords = await geocodeLocation(city, countryCode);
   if (!coords) return null;
 
   const { lat, lon } = coords;
+  const safeStart = encodeURIComponent(startDate);
+  const safeEnd = encodeURIComponent(endDate);
 
   // 1. Try Historical Archive first
   try {
-    const archiveUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${startDate}&end_date=${endDate}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
+    const archiveUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${safeStart}&end_date=${safeEnd}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
     const res = await fetch(archiveUrl, { signal: AbortSignal.timeout(6000) });
     if (res.ok) {
       const data = await res.json();
@@ -116,7 +124,7 @@ export async function fetchTripWeather(
 
   // 2. Try Forecast API (covers recent past, current, and upcoming dates)
   try {
-    const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&start_date=${startDate}&end_date=${endDate}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
+    const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&start_date=${safeStart}&end_date=${safeEnd}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
     const res = await fetch(forecastUrl, { signal: AbortSignal.timeout(6000) });
     if (res.ok) {
       const data = await res.json();

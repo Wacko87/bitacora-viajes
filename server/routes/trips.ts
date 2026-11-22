@@ -129,8 +129,8 @@ export async function tripsRoutes(fastify: FastifyInstance) {
           title: { type: 'string', minLength: 1, maxLength: 200 },
           country_code: { type: 'string', minLength: 2, maxLength: 3 },
           city: { type: ['string', 'null'] },
-          start_date: { type: 'string' },
-          end_date: { type: 'string' },
+          start_date: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
+          end_date: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
           cover_image: { type: ['string', 'null'] },
           status: { type: 'string', enum: ['active', 'completed', 'planned'] },
           summary: { type: ['string', 'null'] },
@@ -168,6 +168,11 @@ export async function tripsRoutes(fastify: FastifyInstance) {
 
     if (!isValidId(id)) {
       return reply.status(400).send({ error: 'Identificador no válido' });
+    }
+
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(start_date) || !dateRegex.test(end_date)) {
+      return reply.status(400).send({ error: 'Formato de fecha inválido. Debe ser YYYY-MM-DD.' });
     }
 
     const parsedCost =

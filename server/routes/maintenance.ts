@@ -20,10 +20,11 @@ export async function maintenanceRoutes(fastify: FastifyInstance) {
     return reply.send({ backups });
   });
 
-  // 3. Trigger garbage collection
+  // 3. Trigger garbage collection (con validación de rango seguro entre 1 y 365 días - SEC-06)
   fastify.post('/gc', async (req: FastifyRequest<{ Body: { retention_days?: number } }>, reply: FastifyReply) => {
     try {
-      const days = req.body?.retention_days ?? 30;
+      const rawDays = req.body?.retention_days ?? 30;
+      const days = Math.max(1, Math.min(365, Math.floor(Number(rawDays) || 30)));
       const report = await runGarbageCollection(days);
       return reply.send({ success: true, report });
     } catch (err: any) {

@@ -43,7 +43,14 @@ await app.register(fastifyCookie, {
   hook: 'onRequest',
 });
 
-// 2. Strict CORS Whitelist
+// 2. Strict CORS Whitelist (SEC-07: Prevención de deriva de dominios)
+const DEFAULT_ALLOWED_DOMAINS = ['localhost', 'wacko87.es', 'viajes.wacko87.es'];
+const ENV_ALLOWED_DOMAINS = (process.env.ALLOWED_DOMAINS || '')
+  .split(',')
+  .map((d) => d.trim().toLowerCase())
+  .filter(Boolean);
+const ALLOWED_DOMAINS = Array.from(new Set([...DEFAULT_ALLOWED_DOMAINS, ...ENV_ALLOWED_DOMAINS]));
+
 await app.register(fastifyCors, {
   origin: (origin, cb) => {
     if (!origin) return cb(null, true);
@@ -54,11 +61,8 @@ await app.register(fastifyCors, {
       if (host === 'localhost' || host === '127.0.0.1') return cb(null, true);
       // Allow internal LAN subnets
       if (/^192\.168\.\d+\.\d+$/.test(host) || /^172\.16\.\d+\.\d+$/.test(host)) return cb(null, true);
-      // Allow domains configured via ALLOWED_DOMAINS env var (comma-separated)
-      const allowedDomains = (process.env.ALLOWED_DOMAINS || 'localhost')
-        .split(',')
-        .map((d) => d.trim().toLowerCase());
-      const isAllowedDomain = allowedDomains.some(
+      // Allow homelab domains and custom configured domains
+      const isAllowedDomain = ALLOWED_DOMAINS.some(
         (domain) => host === domain || host.endsWith(`.${domain}`) || domain === '*'
       );
       if (parsed.protocol === 'https:' && isAllowedDomain) {

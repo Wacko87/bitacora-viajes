@@ -66,7 +66,9 @@ function safeDeleteDirectory(fullDir: string): number {
  * for items soft-deleted more than `retentionDays` ago (default 30 days).
  */
 export async function runGarbageCollection(retentionDays = 30): Promise<MaintenanceReport> {
-  const cutoffSql = `-${retentionDays} days`;
+  // Asegurar rango seguro (1 a 365 días) para prevenir ejecuciones destructivas
+  const safeDays = Math.max(1, Math.min(365, Math.floor(Number(retentionDays) || 30)));
+  const cutoffSql = `-${safeDays} days`;
   let freedBytes = 0;
 
   // 1. Purge Old Soft-deleted Photos

@@ -1,14 +1,31 @@
 import crypto from 'node:crypto';
 
 // In-memory failed attempt tracking (locks out for 5 minutes after 5 failed attempts)
+// Indexado por tupla `${clientIp}:${profileId}` para evitar DoS cruzado a usuarios legítimos
 interface AttemptRecord {
   count: number;
   lockedUntil?: number;
+  lastAttempt: number;
 }
 const failedAttempts = new Map<string, AttemptRecord>();
 
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+const MAX_ATTEMPT_ENTRIES = 500; // Cap para prevenir fugas de memoria
+
+/**
+ * Purga entradas expiradas o inactivas de la memoria para evitar crecimiento ilimitado (Anti-DoS)
+ */
+function pruneExpiredAttempts(): void {
+  const now = Date.now();
+  for (const [key, record] of failedAttempts.entries()) {
+    if (record.lockedUntil && now >= record.lockedUntil) {
+      failedAttempts.delete(key);
+    } else if (!record.lockedUntil && now - record.lastAttempt > LOCKOUT_DURATION_MS * 2) {
+      failedAttempts.delete(key);
+    }
+  }
+}
 
 export function hashPin(pin: string): string {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -17,11 +34,14 @@ export function hashPin(pin: string): string {
 }
 
 export function verifyPin(pin: string, storedHash: string): boolean {
-  if (!storedHash) return false;
+  if (!storedHash || !pin) return false;
 
-  // Support legacy plain text PIN during migration
+  // Support legacy plain text PIN during migration with timing-safe comparison
   if (!storedHash.startsWith('scrypt:')) {
-    return pin === storedHash;
+    const pinBuf = Buffer.from(pin, 'utf8');
+    const storedBuf = Buffer.from(storedHash, 'utf8');
+    if (pinBuf.length !== storedBuf.length) return false;
+    return crypto.timingSafeEqual(pinBuf, storedBuf);
   }
 
   const parts = storedHash.split(':');
@@ -114,9 +134,10 @@ export function isValidImageBuffer(buf: Buffer): boolean {
   return false;
 }
 
-// Rate limiting & Account Lockout
-export function checkAccountLockout(profileId: string): { locked: boolean; remainingSec: number } {
-  const record = failedAttempts.get(profileId);
+// Rate limiting & Account Lockout asociado a (clientIp, profileId)
+export function checkAccountLockout(clientIp: string, profileId: string): { locked: boolean; remainingSec: number } {
+  const key = `${clientIp || 'unknown'}:${profileId}`;
+  const record = failedAttempts.get(key);
   if (!record || !record.lockedUntil) {
     return { locked: false, remainingSec: 0 };
   }
@@ -128,25 +149,34 @@ export function checkAccountLockout(profileId: string): { locked: boolean; remai
   }
 
   // Lockout expired
-  failedAttempts.delete(profileId);
+  failedAttempts.delete(key);
   return { locked: false, remainingSec: 0 };
 }
 
-export function recordFailedAttempt(profileId: string): { locked: boolean; remainingAttempts: number; remainingSec: number } {
+export function recordFailedAttempt(clientIp: string, profileId: string): { locked: boolean; remainingAttempts: number; remainingSec: number } {
+  const key = `${clientIp || 'unknown'}:${profileId}`;
   const now = Date.now();
-  const record = failedAttempts.get(profileId) || { count: 0 };
 
+  // Purgar periódicamente si el mapa crece demasiado
+  if (failedAttempts.size > MAX_ATTEMPT_ENTRIES) {
+    pruneExpiredAttempts();
+  }
+
+  const record = failedAttempts.get(key) || { count: 0, lastAttempt: now };
   record.count += 1;
+  record.lastAttempt = now;
+
   if (record.count >= MAX_FAILED_ATTEMPTS) {
     record.lockedUntil = now + LOCKOUT_DURATION_MS;
-    failedAttempts.set(profileId, record);
+    failedAttempts.set(key, record);
     return { locked: true, remainingAttempts: 0, remainingSec: Math.ceil(LOCKOUT_DURATION_MS / 1000) };
   }
 
-  failedAttempts.set(profileId, record);
+  failedAttempts.set(key, record);
   return { locked: false, remainingAttempts: MAX_FAILED_ATTEMPTS - record.count, remainingSec: 0 };
 }
 
-export function resetFailedAttempts(profileId: string): void {
-  failedAttempts.delete(profileId);
+export function resetFailedAttempts(clientIp: string, profileId: string): void {
+  const key = `${clientIp || 'unknown'}:${profileId}`;
+  failedAttempts.delete(key);
 }

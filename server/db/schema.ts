@@ -1,4 +1,5 @@
 import { db } from './index.ts';
+import { hashPin } from '../services/security.ts';
 
 export function initDb() {
   console.log('[Database] Applying schema...');
@@ -122,7 +123,7 @@ export function initDb() {
     // Column already exists
   }
 
-  // Seed default profiles if not present
+  // Seed default profiles if not present with scrypt hashed PINs
   const profileCountStmt = db.prepare('SELECT COUNT(*) as count FROM profiles');
   const countRow = profileCountStmt.get() as { count: number };
 
@@ -135,8 +136,27 @@ export function initDb() {
 
     const partner1Name = process.env.DEFAULT_PARTNER_1_NAME || 'Viajero 1';
     const partner2Name = process.env.DEFAULT_PARTNER_2_NAME || 'Viajera 2';
-    insertStmt.run('profile_1', partner1Name, 'partner_1', '1234', '#3b82f6');
-    insertStmt.run('profile_2', partner2Name, 'partner_2', '1234', '#ec4899');
-    console.log('[Database] Profiles initialized with default PIN: 1234');
+    const defaultPin1 = process.env.DEFAULT_PARTNER_1_PIN || '1234';
+    const defaultPin2 = process.env.DEFAULT_PARTNER_2_PIN || '1234';
+
+    insertStmt.run('profile_1', partner1Name, 'partner_1', hashPin(defaultPin1), '#3b82f6');
+    insertStmt.run('profile_2', partner2Name, 'partner_2', hashPin(defaultPin2), '#ec4899');
+    console.log('[Database] Profiles initialized with scrypt hashed PINs');
+  }
+
+  // Auto-upgrade any unhashed plaintext PINs in the database (SEC-01)
+  try {
+    const legacyProfiles = db.prepare("SELECT id, pin_code FROM profiles WHERE pin_code NOT LIKE 'scrypt:%'").all() as Array<{ id: string; pin_code: string }>;
+    if (legacyProfiles.length > 0) {
+      const updatePinStmt = db.prepare("UPDATE profiles SET pin_code = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
+      for (const p of legacyProfiles) {
+        if (p.pin_code) {
+          updatePinStmt.run(hashPin(p.pin_code), p.id);
+        }
+      }
+      console.log(`[Database] Auto-migrated ${legacyProfiles.length} legacy plaintext PIN(s) to scrypt hashes.`);
+    }
+  } catch (err) {
+    console.warn('[Database] Could not check legacy plaintext PINs:', err);
   }
 }
