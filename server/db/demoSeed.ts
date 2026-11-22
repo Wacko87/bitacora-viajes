@@ -162,6 +162,49 @@ export function seedDemoData(force = false) {
     'Moneda conmemorativa recibida como cambio en una heladería cerca de la Fontana di Trevi.'
   );
 
+  // Memorabilia: Tickets, Postcards, Souvenirs (for Vitrina)
+  insertArtifact.run(
+    'demo-artifact-shinkansen-ticket',
+    'demo-trip-japan',
+    'profile_1',
+    'ticket',
+    'Billete Shinkansen Serie N700S (Tokio → Kioto)',
+    null,
+    null,
+    2024,
+    'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80',
+    null,
+    'El billete magnético del tren bala a 300 km/h viendo el Monte Fuji desde la ventana.'
+  );
+
+  insertArtifact.run(
+    'demo-artifact-fuji-postcard',
+    'demo-trip-japan',
+    'profile_2',
+    'postcard',
+    'Postal Ilustrada Monte Fuji & Sakura',
+    null,
+    null,
+    2024,
+    'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80',
+    null,
+    'Comprada en una pequeña librería tradicional cerca de la pagoda Chureito.'
+  );
+
+  insertArtifact.run(
+    'demo-artifact-vatican-ticket',
+    'demo-trip-rome',
+    'profile_1',
+    'ticket',
+    'Entrada Museos Vaticanos & Capilla Sixtina',
+    null,
+    null,
+    2023,
+    'https://images.unsplash.com/photo-1543429776-2782fc8e1acd?auto=format&fit=crop&w=800&q=80',
+    null,
+    'Entrada guardada intacta tras admirar los frescos de Miguel Ángel.'
+  );
+
   console.log('✅ [DemoSeed] Demo data loaded successfully.');
 }
 

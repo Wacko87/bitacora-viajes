@@ -40,10 +40,15 @@ A diferencia de las redes sociales convencionales, se enfoca en la intimidad del
 | :---: | :---: |
 | <img src="docs/screenshots/02-trips-view.png" width="100%" alt="Cuaderno de Viajes" /> | <img src="docs/screenshots/03-trip-detail-chronicle.png" width="100%" alt="Detalle del Viaje" /> |
 
-### 🪙 Gabinete Numismático & Series Oficiales de Divisas
-| Vitrina Numismática 3D Interactiva | Series Circulantes (Color / Blanco y Negro) |
+### 🪙 Monedas y Billetes vs. 🏛️ Vitrina de Recuerdos
+| 🪙 Gabinete Numismático 3D (Monedas y Billetes) | 🏛️ Vitrina de Recuerdos (Tickets, Postales y Souvenirs) |
 | :---: | :---: |
-| <img src="docs/screenshots/06-numismatic-cabinet.png" width="100%" alt="Gabinete Numismático" /> | <img src="docs/screenshots/04-numismatic-series.png" width="100%" alt="Series Circulantes" /> |
+| <img src="docs/screenshots/06-numismatic-cabinet.png" width="100%" alt="Gabinete Numismático" /> | <img src="docs/screenshots/06-vitrina-recuerdos.png" width="100%" alt="Vitrina de Recuerdos" /> |
+
+### 🌍 Series Circulantes Oficiales del Cono Monetario
+<p align="center">
+  <img src="docs/screenshots/04-numismatic-series.png" width="100%" alt="Series Circulantes Oficiales" />
+</p>
 
 ### 📖 Libro de Viaje Editorial & Pasaporte Digital
 | Libro de Viaje Maquetado para Imprimir (PDF A4) | Pasaporte & Mapamundi SVG Interactivo |
@@ -59,12 +64,17 @@ A diferencia de las redes sociales convencionales, se enfoca en la intimidad del
 
 ## 🌟 Características Destacadas
 
-### 1. 🪙 Gabinete Numismático y Cono Monetario
-* **Visor Flip Card 3D:** Tarjetas táctiles interactivas con giro de 180° a 60–120 fps en CSS 3D nativo, simulando una cápsula de colección.
-* **Series Circulantes Oficiales:** Álbum predefinido de billetes y monedas vigentes en el país durante el año de visita. Las piezas conseguidas se muestran a todo color y las pendientes en escala de grises.
-* **Ficha Técnica Detallada:** Denominación, año de emisión, divisa y notas sobre cómo y dónde se obtuvo cada pieza.
+### 1. 🪙 Gabinete Numismático (Monedas y Billetes)
+* **Sección Independiente y Especializada:** Espacio exclusivo para la colección numismática, separada de los recuerdos de papel y souvenirs para una visualización despejada.
+* **Visor Flip Card 3D:** Tarjetas táctiles interactivas con giro de 180° a 60–120 fps en CSS 3D nativo, simulando una cápsula de coleccionista con anverso y reverso.
+* **Series Circulantes Oficiales:** Álbum visual del cono monetario de cada país. Las piezas conseguidas se muestran a todo color y las pendientes en escala de grises.
+* **Filtros por País y Denominación:** Búsqueda rápida por valor facial, año y anécdotas de obtención.
 
-### 2. 📝 Crónica Diaria a Dos Voces
+### 2. 🏛️ Vitrina de Recuerdos (Tickets, Postales y Souvenirs)
+* **Memorabilia de Viaje:** Sección dedicada para entradas de museos y monumentos, billetes de tren o metro, postales ilustradas y souvenirs físicos.
+* **Organización Limpia:** Descongestiona la colección principal agrupando recuerdos físicos con filtros rápidos por categoría.
+
+### 3. 📝 Crónica Diaria a Dos Voces
 * **Doble Perspectiva:** Cada jornada permite a ambos miembros de la pareja escribir su versión de los hechos de forma simultánea e independiente.
 * **Álbum de Recuerdos Integrado:** Subida múltiple de fotografías por destino con selección de foto de portada.
 

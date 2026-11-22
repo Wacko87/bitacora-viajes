@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Landmark, Compass, Award, Plus, LogOut, User, KeyRound, X, Check } from 'lucide-react';
+import { Landmark, Compass, Award, Plus, LogOut, User, KeyRound, X, Check, Coins } from 'lucide-react';
 import { Profile } from '../types.ts';
 import { api } from '../api.ts';
 
 interface Props {
-  currentTab: 'cabinet' | 'trips' | 'passport';
-  onTabChange: (tab: 'cabinet' | 'trips' | 'passport') => void;
+  currentTab: 'numismatics' | 'cabinet' | 'trips' | 'passport';
+  onTabChange: (tab: 'numismatics' | 'cabinet' | 'trips' | 'passport') => void;
   onOpenQuickCapture: () => void;
   currentUser: Profile | null;
   onLogout: () => void;
@@ -118,12 +118,24 @@ export const Navigation: React.FC<Props> = ({
       </header>
 
       {/* Bottom Nav Bar (Mobile Friendly) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 bg-zinc-950/90 backdrop-blur-lg border-t border-zinc-800/80 px-4 pt-1.5 safe-bottom flex items-center justify-around shadow-2xl">
+      <nav className="fixed bottom-0 left-0 right-0 z-30 bg-zinc-950/90 backdrop-blur-lg border-t border-zinc-800/80 px-2 sm:px-4 pt-1.5 safe-bottom flex items-center justify-around shadow-2xl">
+        <button
+          onClick={() => onTabChange('numismatics')}
+          className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-all ${
+            currentTab === 'numismatics' ? 'text-amber-400 font-semibold' : 'text-zinc-500 hover:text-zinc-300'
+          }`}
+          title="Gabinete de Monedas y Billetes"
+        >
+          <Coins className="w-5 h-5" />
+          <span className="text-[10px] font-medium tracking-tight">Monedas</span>
+        </button>
+
         <button
           onClick={() => onTabChange('cabinet')}
-          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${
-            currentTab === 'cabinet' ? 'text-amber-400' : 'text-zinc-500 hover:text-zinc-300'
+          className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-all ${
+            currentTab === 'cabinet' ? 'text-amber-400 font-semibold' : 'text-zinc-500 hover:text-zinc-300'
           }`}
+          title="Vitrina de Recuerdos, Tickets y Souvenirs"
         >
           <Landmark className="w-5 h-5" />
           <span className="text-[10px] font-medium tracking-tight">Vitrina</span>
@@ -132,17 +144,18 @@ export const Navigation: React.FC<Props> = ({
         {/* Central Modo Ruta Action Button */}
         <button
           onClick={onOpenQuickCapture}
-          className="relative -top-4 w-14 h-14 rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-zinc-950 flex items-center justify-center shadow-lg shadow-amber-500/30 border-4 border-zinc-950 active:scale-95 transition-transform"
+          className="relative -top-3 sm:-top-4 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-zinc-950 flex items-center justify-center shadow-lg shadow-amber-500/30 border-4 border-zinc-950 active:scale-95 transition-transform shrink-0"
           title="Captura Rápida en Ruta (5s)"
         >
-          <Plus className="w-7 h-7 stroke-[2.5]" />
+          <Plus className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.5]" />
         </button>
 
         <button
           onClick={() => onTabChange('trips')}
-          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${
-            currentTab === 'trips' ? 'text-amber-400' : 'text-zinc-500 hover:text-zinc-300'
+          className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-all ${
+            currentTab === 'trips' ? 'text-amber-400 font-semibold' : 'text-zinc-500 hover:text-zinc-300'
           }`}
+          title="Cuaderno de Viajes"
         >
           <Compass className="w-5 h-5" />
           <span className="text-[10px] font-medium tracking-tight">Viajes</span>
@@ -150,9 +163,10 @@ export const Navigation: React.FC<Props> = ({
 
         <button
           onClick={() => onTabChange('passport')}
-          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${
-            currentTab === 'passport' ? 'text-amber-400' : 'text-zinc-500 hover:text-zinc-300'
+          className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-all ${
+            currentTab === 'passport' ? 'text-amber-400 font-semibold' : 'text-zinc-500 hover:text-zinc-300'
           }`}
+          title="Pasaporte y Estadísticas"
         >
           <Award className="w-5 h-5" />
           <span className="text-[10px] font-medium tracking-tight">Pasaporte</span>

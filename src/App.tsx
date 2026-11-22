@@ -4,6 +4,7 @@ import { api } from './api.ts';
 import { Navigation } from './components/Navigation.tsx';
 import { SyncBadge } from './components/SyncBadge.tsx';
 import { LoginView } from './views/LoginView.tsx';
+import { NumismaticsView } from './views/NumismaticsView.tsx';
 import { CabinetView } from './views/CabinetView.tsx';
 import { TripsView } from './views/TripsView.tsx';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
@@ -32,7 +33,7 @@ export const App: React.FC = () => {
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
 
   // App data state
-  const [currentTab, setCurrentTab] = useState<'cabinet' | 'trips' | 'passport'>('cabinet');
+  const [currentTab, setCurrentTab] = useState<'numismatics' | 'cabinet' | 'trips' | 'passport'>('numismatics');
   const [trips, setTrips] = useState<Trip[]>([]);
   const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
@@ -255,11 +256,23 @@ export const App: React.FC = () => {
             </Suspense>
           ) : (
             <>
+              {currentTab === 'numismatics' && (
+                <NumismaticsView
+                  artifacts={allArtifacts}
+                  trips={trips}
+                  onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
+                  onRefresh={loadAppData}
+                  onNavigateToCabinet={() => setCurrentTab('cabinet')}
+                />
+              )}
+
               {currentTab === 'cabinet' && (
                 <CabinetView
                   artifacts={allArtifacts}
+                  trips={trips}
                   onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
                   onRefresh={loadAppData}
+                  onNavigateToNumismatics={() => setCurrentTab('numismatics')}
                 />
               )}
 
